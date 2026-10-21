@@ -270,7 +270,7 @@ catch(e){document.documentElement.setAttribute('data-theme','dark')}
           <button type="button" class="btn ghost full" id="tcancel" hidden>Cancelar edição</button>
         </form>
       </div>
-      <div class="card"><h2 class="ct">Movimentações do mês</h2><div id="txs" class="list"></div></div>
+      <div class="card"><h2 class="ct">Transações do mês</h2><div id="txs" class="list"></div></div>
     </section>
 
     <!-- CONTAS A PAGAR -->
@@ -418,10 +418,10 @@ save()});
 $('tc').innerHTML=CATS.map(c=>`<option>${esc(c)}</option>`).join('');
 
 /* ---------- navegação ---------- */
-const NAV=[{v:'painel',t:'Painel',i:'grid'},{v:'mov',t:'Movimentações',i:'swap'},{v:'contas',t:'Contas',i:'cal'},{v:'cfg',t:'Configurações',i:'sliders'}];
+const NAV=[{v:'painel',t:'Painel',i:'grid'},{v:'mov',t:'Transações',i:'swap'},{v:'contas',t:'Contas',i:'cal'},{v:'cfg',t:'Configurações',i:'sliders'}];
 const nomeUser=()=>(lsGet('fin2-nome')||'').trim();
 const saudacao=()=>nomeUser()?'Olá, '+nomeUser():'Olá';
-const TITLES={painel:'Olá',mov:'Movimentações',contas:'Contas a pagar',cfg:'Configurações'};
+const TITLES={painel:'Olá',mov:'Transações',contas:'Contas a pagar',cfg:'Configurações'};
 $('snav').innerHTML=NAV.map(n=>`<button type="button" data-go="${n.v}">${svg(n.i)}${n.t}</button>`).join('');
 const tb=n=>`<button type="button" data-go="${n.v}">${svg(n.i)}<span>${n.t}</span></button>`;
 $('tabs').innerHTML=tb(NAV[0])+tb(NAV[1])+`<button type="button" class="add" data-new aria-label="Nova movimentação"><span>${svg('plus')}</span></button>`+tb(NAV[2])+tb(NAV[3]);
