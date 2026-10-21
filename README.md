@@ -13,8 +13,8 @@ Funciona direto no navegador, no celular, no tablet e no computador. Não precis
 - **Metas por categoria:** limite mensal por categoria, com barra de progresso e aviso ao estourar.
 - **Gráficos:** gastos por categoria (rosca) e comparação dos últimos 6 meses.
 - **Backup e planilha:** baixar e restaurar um backup, e exportar as movimentações em CSV.
-- **Aparência:** escolha da cor dos botões e do fundo.
-- **Layout adaptável:** uma coluna no celular, duas colunas em telas grandes.
+- **Aparência:** tema escuro (padrão), claro ou automático, com cor de destaque roxa, verde, azul ou cinza.
+- **Layout adaptável:** barra de abas no celular e barra lateral no computador e no tablet.
 
 ## Como usar
 
@@ -32,7 +32,7 @@ Isso significa que:
 - limpar o navegador, trocar de aparelho ou apagar o atalho faz os dados serem perdidos;
 - cada aparelho tem os próprios dados.
 
-Use o botão **Baixar backup**, em Configurações, de vez em quando.
+Use o botão **Baixar cópia de segurança**, em Configurações, de vez em quando.
 
 ## Estrutura do projeto
 
@@ -43,7 +43,7 @@ primefinance/
 └── .gitignore   # arquivos que o Git deve ignorar
 ```
 
-O app é um arquivo único e não usa bibliotecas externas.
+O app é um arquivo único e não usa bibliotecas externas (apenas as fontes Sora e Manrope, do Google Fonts, com fonte de reserva do sistema).
 
 ## Próximos passos
 
