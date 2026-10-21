@@ -8,12 +8,12 @@ Funciona direto no navegador, no celular, no tablet e no computador. Não precis
 
 - **Movimentações:** lançar, editar e apagar gastos e receitas, com categoria e data.
 - **Resumo do mês:** receitas, gastos, saldo e quanto ainda falta pagar, com um aviso quando as despesas passam dos ganhos.
-- **Contas a pagar:** com vencimento, destaque para contas vencidas e botão para marcar como paga (a conta vira um gasto).
+- **Contas a pagar:** com vencimento, edição das informações, destaque para contas vencidas e botão para marcar como paga (a conta vira um gasto).
 - **Contas fixas:** contas que se repetem todo mês, no mesmo dia.
 - **Metas por categoria:** limite mensal por categoria, com barra de progresso e aviso ao estourar.
 - **Gráficos:** gastos por categoria (rosca) e comparação dos últimos 6 meses.
 - **Backup e planilha:** baixar e restaurar um backup, e exportar as movimentações em CSV.
-- **Aparência:** tema escuro (padrão), claro ou automático, com cor de destaque roxa, verde, azul ou cinza.
+- **Aparência:** tema escuro (padrão) ou claro, com cor de destaque roxa, verde, azul ou cinza.
 - **Layout adaptável:** barra de abas no celular e barra lateral no computador e no tablet.
 
 ## Como usar
