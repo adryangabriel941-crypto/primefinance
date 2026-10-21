@@ -1,0 +1,16 @@
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+
+# Dados pessoais exportados pelo app (nunca enviar ao GitHub)
+primefinance-backup-*.json
+primefinance-movimentacoes-*.csv
+
+# Segredos e chaves
+.env
+.env.*
+*.key
+*.pem
