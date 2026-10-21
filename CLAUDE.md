@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Sobre o projeto
 
-Primefinance é um app web de finanças pessoais (resumo do mês, transações, contas a pagar, contas fixas, metas por categoria, gráficos, backup/CSV e configurações de tema e cor). É publicado no Netlify como site estático.
+Primefinance é um app web de finanças pessoais (resumo do mês, transações, contas a pagar, contas fixas, metas por categoria, gráficos, backup/CSV e configurações de tema e cor). Tem login com e-mail e senha (Supabase) e salva os dados de cada usuário na nuvem. É publicado no Netlify como site estático.
 
 ## Fluxo de trabalho
 
@@ -17,16 +17,23 @@ Primefinance é um app web de finanças pessoais (resumo do mês, transações, 
 
 ## Comandos
 
-Não há build, dependências, lint nem testes automatizados. Para rodar, basta abrir `index.html` no navegador. A publicação consiste em hospedar o `index.html` como arquivo estático (Netlify).
+Não há build, dependências, lint nem testes automatizados. Para rodar, basta abrir `index.html` no navegador (é preciso internet para entrar na conta). A publicação consiste em hospedar o `index.html` como arquivo estático (Netlify).
 
 ## Arquitetura
 
-O app inteiro está em `index.html`: CSS em um `<style>`, um pequeno `<script>` no `<head>` e a lógica em um `<script>` no fim do `<body>`. Só usa recursos externos para as fontes Sora e Manrope (Google Fonts). O JavaScript é compacto, com nomes curtos, e deve continuar nesse estilo.
+O app inteiro está em `index.html`: CSS em um `<style>`, um pequeno `<script>` no `<head>` e a lógica em um `<script>` no fim do `<body>`. Só usa recursos externos para as fontes Sora e Manrope (Google Fonts) e para o Supabase (via `fetch`, sem biblioteca). O JavaScript é compacto, com nomes curtos, e deve continuar nesse estilo.
 
 ### Estado e persistência
 - Todo o estado fica no objeto `S = {tx, bills, goals, recur}`, salvo como JSON no `localStorage` na chave `fin1-d-local` (`dk()`). Sempre chame `save()` depois de alterar `S`, e em seguida `render()`.
 - Campos dos modelos: movimentação `{id, d (descrição), v (valor), t ('d' despesa | 'r' receita), c (categoria), dt ('AAAA-MM-DD')}`; conta `{id, d, v, dt, paid, rid?, ym?}`; conta fixa `{id, d, v, day, from ('AAAA-MM'), skip[]}`; `goals` mapeia categoria → limite mensal.
 - Tema, cor e nome ficam em chaves separadas: `fin2-tema` (`escuro|claro`), `fin2-cor` (`roxo|verde|azul|cinza`) e `fin2-nome` (nome exibido na saudação "Olá, nome" do painel). O script do `<head>` aplica esses valores antes da renderização para evitar flash. Se mudar a lógica de tema/cor, atualize esse script **e** as funções `setTema`/`setAccent`.
+
+### Conta e sincronização (Supabase)
+- Projeto Supabase `zkosgfeglpmfkdauqcwe`. O código usa só a chave **publishable** (`sb_publishable_...`), que pode ficar no código. **Nunca** coloque a chave `sb_secret_...` no repositório.
+- Autenticação por REST (`/auth/v1/signup`, `/auth/v1/token`, `/auth/v1/logout`) na função `api()`. A sessão fica em `fin2-sessao` (`localStorage`) e é renovada por `fresh()`. Os erros do Supabase são traduzidos em português formal no objeto `ERR`.
+- Os dados ficam na tabela `public.dados` (`user_id` uuid PK, `conteudo` jsonb com o objeto `S`, `atualizado`), com RLS: cada usuário só acessa a própria linha. Qualquer mudança nessa tabela deve manter o RLS ligado e as quatro políticas.
+- `save()` grava o cache local (`fin1-d-<id do usuário>`) e chama `push()`, que envia `S` ao Supabase após 600 ms. Ao entrar (`entrar()`), a nuvem prevalece; se estiver vazia, os dados antigos de `fin1-d-local` são migrados uma única vez (`fin2-migrado`).
+- A tela de entrada (`#auth`) aparece quando o `body` tem a classe `out`. Ao sair, o cache local do usuário é apagado.
 
 ### Fluxo de renderização
 - `render()` redesenha tudo (painel, gráficos, listas) a partir de `S` e do mês selecionado em `#mes`. Não há atualização parcial.

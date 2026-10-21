@@ -178,6 +178,23 @@ textarea{min-height:120px;font:16px/1.4 ui-monospace,Menlo,Consolas,monospace;re
 .bar{height:8px;border-radius:99px;background:var(--surface2);overflow:hidden}
 .bar i{display:block;height:100%;border-radius:99px;background:var(--bc)}
 
+/* entrada */
+body.out .shell,body.out .tabbar{display:none}
+#auth{display:none;min-height:100vh;padding:24px 0;align-items:center;justify-content:center}
+body.out #auth{display:flex}
+.acard{width:100%;max-width:400px;display:grid;gap:16px;padding:24px}
+.acard .brand{justify-content:center;font-size:1.25rem}
+.acard h1{font:700 1.3rem var(--font-d);text-align:center}
+.acard .sub{color:var(--mut);text-align:center;font-size:.9rem}
+.atabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:4px;border-radius:12px;background:var(--surface2)}
+.atabs button{padding:9px;border:0;border-radius:9px;background:transparent;color:var(--mut);font-weight:700;cursor:pointer}
+.atabs button.on{background:var(--ac);color:var(--on-ac)}
+.acard form{display:grid;gap:10px}
+.acard label{display:grid;gap:5px;color:var(--mut);font-size:.8rem}
+.amsg{min-height:1.3em;font-size:.85rem;color:var(--bad)}
+.amsg.ok{color:var(--ok)}
+.sync{font-size:.72rem;color:var(--mut)}
+
 /* ajustes */
 .pick{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px}
 .pick:last-child{margin-bottom:0}
@@ -205,12 +222,26 @@ catch(e){document.documentElement.setAttribute('data-theme','dark')}
 
 </head>
 <body>
+<div id="auth">
+  <div class="card acard">
+    <div class="brand"><span class="logo" data-ic="trend"></span>Primefinance</div>
+    <p class="sub" id="asub">Entre na sua conta para acessar seus dados em qualquer dispositivo.</p>
+    <div class="atabs" role="tablist"><button type="button" class="on" id="tin">Entrar</button><button type="button" id="tup">Criar conta</button></div>
+    <form id="fa" novalidate>
+      <label id="lnome" hidden>Como deseja ser chamado<input id="anome" type="text" maxlength="30" autocomplete="given-name" placeholder="Seu nome"></label>
+      <label>E-mail<input id="aemail" type="email" autocomplete="email" inputmode="email" placeholder="nome@exemplo.com" required></label>
+      <label>Senha<input id="asenha" type="password" autocomplete="current-password" placeholder="Mínimo de 8 caracteres" required></label>
+      <button class="btn wide" id="abtn">Entrar</button>
+    </form>
+    <p class="amsg" id="amsg" role="alert"></p>
+  </div>
+</div>
 <div class="shell">
   <aside class="side">
     <div class="brand"><span class="logo" data-ic="trend"></span>Primefinance - Teste</div>
     <button type="button" class="btn" data-new><span data-ic="plus"></span>Nova movimentação</button>
     <nav class="nav" id="snav" aria-label="Principal"></nav>
-    <p class="foot">Seus dados são armazenados neste navegador.</p>
+    <p class="foot"><span id="syn" class="sync">Sincronizado com a sua conta.</span></p>
   </aside>
 
   <div class="main">
@@ -296,6 +327,11 @@ catch(e){document.documentElement.setAttribute('data-theme','dark')}
     <!-- AJUSTES -->
     <section id="v-cfg" class="stack narrow" hidden>
       <div class="card">
+        <h2 class="ct">Conta</h2>
+        <p class="lbl" style="margin-bottom:12px">Conectado como <b id="cmail"></b>. Seus dados são salvos na sua conta e ficam disponíveis em qualquer dispositivo.</p>
+        <button type="button" class="btn ghost" id="sair">Sair da conta</button>
+      </div>
+      <div class="card">
         <h2 class="ct">Seu nome</h2>
         <p class="lbl" style="margin-bottom:10px">Informe como você prefere ser chamado. O nome aparece na saudação da tela inicial.</p>
         <input id="nome" type="text" maxlength="30" autocomplete="given-name" placeholder="Seu nome" aria-label="Seu nome">
@@ -320,7 +356,7 @@ catch(e){document.documentElement.setAttribute('data-theme','dark')}
       </div>
       <div class="card">
         <h2 class="ct">Cópia de segurança e planilha</h2>
-        <p class="lbl" style="margin-bottom:12px">Seus dados são armazenados apenas neste navegador. Faça uma cópia de segurança periodicamente para evitar perdas. Para transferir os dados da versão anterior, gere a cópia de segurança lá e restaure-a aqui.</p>
+        <p class="lbl" style="margin-bottom:12px">Seus dados são salvos na sua conta. Ainda assim, é recomendável gerar uma cópia de segurança periodicamente.</p>
         <div class="btns">
           <button type="button" class="btn" id="bk">Baixar cópia de segurança</button>
           <button type="button" class="btn ghost" id="rs">Restaurar cópia de segurança</button>
@@ -352,11 +388,11 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 const today=(()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')})();
 const EMPTY=()=>({tx:[],bills:[],goals:{},recur:[]});
 let S=EMPTY(),editId=null,editBill=null,view='painel',pend=null;
-const user='local';
+let user='local',SES=null;
 const dk=()=>'fin1-d-'+user;
 const lsGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
 const lsSet=(k,v)=>{try{localStorage.setItem(k,v);return true}catch(e){return false}};
-const save=()=>lsSet(dk(),JSON.stringify(S));
+const save=()=>{lsSet(dk(),JSON.stringify(S));push()};
 function load(){try{const r=lsGet(dk());S=r?JSON.parse(r):EMPTY();if(!S||!Array.isArray(S.tx)||!Array.isArray(S.bills))S=EMPTY()}catch(e){S=EMPTY()}
 if(!S.goals||typeof S.goals!=='object'||Array.isArray(S.goals))S.goals={};
 if(!Array.isArray(S.recur))S.recur=[]}
@@ -419,6 +455,7 @@ $('tc').innerHTML=CATS.map(c=>`<option>${esc(c)}</option>`).join('');
 
 /* ---------- navegação ---------- */
 const NAV=[{v:'painel',t:'Painel',i:'grid'},{v:'mov',t:'Transações',i:'swap'},{v:'contas',t:'Contas',i:'cal'},{v:'cfg',t:'Configurações',i:'sliders'}];
+let tn;
 const nomeUser=()=>(lsGet('fin2-nome')||'').trim();
 const saudacao=()=>nomeUser()?'Olá, '+nomeUser():'Olá';
 const TITLES={painel:'Olá',mov:'Transações',contas:'Contas a pagar',cfg:'Configurações'};
@@ -455,7 +492,7 @@ let t=lsGet('fin2-tema');if(!['escuro','claro'].includes(t))t='escuro';setTema(t
 
 /* ---------- nome do usuário ---------- */
 $('nome').value=nomeUser();
-$('nome').addEventListener('input',()=>{lsSet('fin2-nome',$('nome').value.trim().slice(0,30))});
+$('nome').addEventListener('input',()=>{lsSet('fin2-nome',$('nome').value.trim().slice(0,30));clearTimeout(tn);tn=setTimeout(()=>api('/auth/v1/user',{method:'PUT',body:{data:{nome:nomeUser()}}}).catch(()=>{}),800)});
 
 /* ---------- lançamentos ---------- */
 $('mes').addEventListener('input',render);
@@ -654,11 +691,94 @@ bmsg('Cópia de segurança restaurada: '+S.tx.length+' movimentações e '+S.bil
 document.addEventListener('focusin',e=>{if(e.target.matches('input,select,textarea'))document.body.classList.add('typing')});
 document.addEventListener('focusout',()=>document.body.classList.remove('typing'));
 
+/* ---------- conta e sincronização ---------- */
+const SB='https://zkosgfeglpmfkdauqcwe.supabase.co',KEY='sb_publishable_vwF61o_zAUxMzhapTlKD-g_kicGY5de';
+const ERR={invalid_credentials:'E-mail ou senha incorretos.',user_already_exists:'Já existe uma conta com este e-mail.',email_exists:'Já existe uma conta com este e-mail.',weak_password:'A senha é muito fraca. Utilize ao menos 8 caracteres.',email_not_confirmed:'Confirme o seu e-mail antes de entrar.',over_email_send_rate_limit:'Limite de envio de e-mails atingido. Aguarde alguns minutos.',over_request_rate_limit:'Muitas tentativas. Aguarde alguns minutos.',signup_disabled:'O cadastro de novas contas está desativado.',validation_failed:'Informe um e-mail válido.',email_address_invalid:'Informe um e-mail válido.'};
+async function api(p,o={},tok){
+const h={apikey:KEY,'Content-Type':'application/json'};
+const t=tok===undefined?(SES&&SES.access_token):tok;
+if(t)h.Authorization='Bearer '+t;
+Object.assign(h,o.headers||{});
+let r;try{r=await fetch(SB+p,{method:o.method||'GET',headers:h,body:o.body?JSON.stringify(o.body):undefined})}catch(e){const x=new Error('Não foi possível conectar. Verifique a sua conexão com a internet.');x.net=true;throw x}
+let d=null;const tx=await r.text();try{d=tx?JSON.parse(tx):null}catch(e){}
+if(!r.ok){const c=d&&(d.error_code||d.code),x=new Error(ERR[c]||(d&&(d.msg||d.message||d.error_description))||'Erro '+r.status);x.code=c;x.status=r.status;throw x}
+return d}
+function sesSave(d){SES={access_token:d.access_token,refresh_token:d.refresh_token,expires_at:d.expires_at||Math.floor(Date.now()/1000)+(d.expires_in||3600),user:d.user||(SES&&SES.user)};lsSet('fin2-sessao',JSON.stringify(SES))}
+async function fresh(){
+if(!SES)return false;
+if(SES.expires_at-60>Date.now()/1000)return true;
+try{sesSave(await api('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:{refresh_token:SES.refresh_token}},null));return true}
+catch(e){if(e.net)return SES.expires_at>Date.now()/1000?true:'off';SES=null;try{localStorage.removeItem('fin2-sessao')}catch(x){}return false}}
+const syn=(t,bad)=>{const e=$('syn');e.textContent=t;e.style.color=bad?'var(--warn)':''};
+let tp=null,busy=false,again=false;
+function push(){if(!SES)return;syn('Sincronizando…');clearTimeout(tp);tp=setTimeout(flush,600)}
+async function flush(){
+if(!SES)return;if(busy){again=true;return}busy=true;
+try{
+if(await fresh()===false)throw new Error('sessão');
+await api('/rest/v1/dados?on_conflict=user_id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:{user_id:SES.user.id,conteudo:S,atualizado:new Date().toISOString()}});
+syn('Sincronizado com a sua conta.')}
+catch(e){syn(e.net?'Sem conexão: salvo neste aparelho e será sincronizado depois.':'Não foi possível sincronizar: '+e.message,true)}
+busy=false;if(again){again=false;flush()}}
+async function baixarNuvem(){
+const r=await api('/rest/v1/dados?select=conteudo&user_id=eq.'+SES.user.id);
+return r&&r[0]?r[0].conteudo:null}
+const valido=c=>c&&Array.isArray(c.tx)&&Array.isArray(c.bills);
+async function entrar(){
+document.body.classList.remove('out');
+user=SES.user.id;$('cmail').textContent=SES.user.email||'';
+load();
+try{
+const c=await baixarNuvem();
+if(valido(c)){S=c;if(!S.goals||typeof S.goals!=='object'||Array.isArray(S.goals))S.goals={};if(!Array.isArray(S.recur))S.recur=[];lsSet(dk(),JSON.stringify(S));syn('Sincronizado com a sua conta.')}
+else{
+let leg=null;try{leg=JSON.parse(lsGet('fin1-d-local')||'null')}catch(e){}
+if(!lsGet('fin2-migrado')&&valido(leg)&&(leg.tx.length||leg.bills.length)){S=leg;if(!S.goals)S.goals={};if(!Array.isArray(S.recur))S.recur=[];lsSet('fin2-migrado','1')}
+flush()}}
+catch(e){syn(e.net?'Sem conexão: exibindo os dados salvos neste aparelho.':'Não foi possível carregar a nuvem: '+e.message,true)}
+if(!nomeUser()&&SES.user.user_metadata&&SES.user.user_metadata.nome)lsSet('fin2-nome',SES.user.user_metadata.nome);
+$('nome').value=nomeUser();
+genRecur();buildGoals();$('mes').value=today.slice(0,7);resetForm();resetBill();go('painel')}
+
+/* tela de entrada */
+let modo='in';
+function setModo(m){modo=m;$('tin').classList.toggle('on',m==='in');$('tup').classList.toggle('on',m==='up');
+$('lnome').hidden=m==='in';$('abtn').textContent=m==='in'?'Entrar':'Criar conta';
+$('asenha').autocomplete=m==='in'?'current-password':'new-password';$('amsg').textContent='';
+$('asub').textContent=m==='in'?'Entre na sua conta para acessar seus dados em qualquer dispositivo.':'Crie sua conta para salvar seus dados com segurança e acessá-los em qualquer dispositivo.'}
+$('tin').onclick=()=>setModo('in');$('tup').onclick=()=>setModo('up');
+const amsg=(t,ok)=>{const e=$('amsg');e.textContent=t;e.className='amsg'+(ok?' ok':'')};
+$('fa').onsubmit=async e=>{e.preventDefault();
+const email=$('aemail').value.trim(),senha=$('asenha').value;
+if(!/^\S+@\S+\.\S+$/.test(email)){amsg('Informe um e-mail válido.');return}
+if(modo==='up'&&senha.length<8){amsg('A senha deve ter ao menos 8 caracteres.');return}
+if(!senha){amsg('Informe a sua senha.');return}
+$('abtn').disabled=true;amsg('Aguarde…',true);
+try{
+if(modo==='up'){
+const nome=$('anome').value.trim().slice(0,30);
+const d=await api('/auth/v1/signup',{method:'POST',body:{email,password:senha,data:{nome}}},null);
+if(nome)lsSet('fin2-nome',nome);
+if(d&&d.access_token){sesSave(d);$('asenha').value='';await entrar();return}
+amsg('Conta criada. Enviamos uma mensagem de confirmação para '+email+'. Confirme o e-mail e, em seguida, entre.',true);setModo('in');$('aemail').value=email;$('amsg').textContent='Conta criada. Confirme o seu e-mail e, em seguida, entre.';$('amsg').className='amsg ok'}
+else{
+const d=await api('/auth/v1/token?grant_type=password',{method:'POST',body:{email,password:senha}},null);
+sesSave(d);$('asenha').value='';await entrar()}}
+catch(x){amsg(x.message)}
+finally{$('abtn').disabled=false}};
+$('sair').onclick=async()=>{
+clearTimeout(tp);try{await flush()}catch(e){}
+try{await api('/auth/v1/logout',{method:'POST'})}catch(e){}
+try{localStorage.removeItem('fin1-d-'+user);localStorage.removeItem('fin2-sessao');localStorage.removeItem('fin2-nome')}catch(e){}
+SES=null;S=EMPTY();user='local';$('nome').value='';setModo('in');$('aemail').value='';amsg('');
+document.body.classList.add('out');window.scrollTo(0,0)};
+
 /* ---------- início ---------- */
-load();genRecur();buildGoals();
-$('mes').value=today.slice(0,7);
-resetForm();$('bdt').value=today;
-go('painel');
+(async()=>{
+try{SES=JSON.parse(lsGet('fin2-sessao')||'null')}catch(e){SES=null}
+if(SES&&SES.user&&SES.refresh_token){const f=await fresh();if(f===false)SES=null}else SES=null;
+if(SES){await entrar()}
+else{document.body.classList.add('out')}})();
 </script>
 
 </body>

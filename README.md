@@ -12,6 +12,7 @@ Funciona direto no navegador, no celular, no tablet e no computador. Não precis
 - **Contas fixas:** contas que se repetem todo mês, no mesmo dia.
 - **Metas por categoria:** limite mensal por categoria, com barra de progresso e aviso ao estourar.
 - **Gráficos:** gastos por categoria (rosca) e comparação dos últimos 6 meses.
+- **Conta:** login com e-mail e senha e dados sincronizados na nuvem.
 - **Backup e planilha:** baixar e restaurar um backup, e exportar as movimentações em CSV.
 - **Aparência:** tema escuro (padrão) ou claro, com cor de destaque roxa, verde, azul ou cinza.
 - **Layout adaptável:** barra de abas no celular e barra lateral no computador e no tablet.
@@ -25,14 +26,14 @@ Para publicar na internet, basta hospedar o `index.html` em qualquer serviço de
 
 ## Seus dados
 
-Os dados ficam salvos **apenas no navegador** de quem usa (`localStorage`). Nada é enviado para servidor nenhum.
+Cada pessoa cria uma conta com e-mail e senha. Os dados ficam salvos na conta (Supabase) e só a própria pessoa tem acesso a eles. Um cache fica no navegador para o app abrir rápido.
 
 Isso significa que:
 
-- limpar o navegador, trocar de aparelho ou apagar o atalho faz os dados serem perdidos;
-- cada aparelho tem os próprios dados.
+- é possível entrar em outro aparelho e ver os mesmos dados;
+- sem internet, o app mostra os dados salvos no aparelho e sincroniza quando a conexão voltar.
 
-Use o botão **Baixar cópia de segurança**, em Configurações, de vez em quando.
+Mesmo assim, use o botão **Baixar cópia de segurança**, em Configurações, de vez em quando.
 
 ## Estrutura do projeto
 
@@ -47,7 +48,6 @@ O app é um arquivo único e não usa bibliotecas externas (apenas as fontes Sor
 
 ## Próximos passos
 
-- Login e dados salvos na nuvem, com Supabase, para acessar de qualquer aparelho.
 - Comparação com o mês anterior e resumo do ano.
 - Busca e filtros nas movimentações.
 - Categorias personalizadas.
