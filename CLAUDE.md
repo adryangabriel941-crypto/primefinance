@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Sobre o projeto
 
-Primefinance é um app web de finanças pessoais (resumo do mês, transações com busca e filtros, contas a pagar, contas fixas, metas por categoria, objetivos de economia, alerta de contas a vencer, gráficos, backup/CSV e configurações de tema e cor). Tem login com e-mail e senha (Supabase) e salva os dados de cada usuário na nuvem. É publicado no Netlify como site estático.
+Primefinance é um app web de finanças pessoais (resumo do mês com comparação com o mês anterior, transações com busca e filtros, compras parceladas, receitas fixas, contas a pagar, contas fixas, metas por categoria, objetivos de economia, alerta de contas a vencer, gráficos, backup/CSV e configurações de tema e cor). Tem login com e-mail e senha (Supabase) e salva os dados de cada usuário na nuvem. É publicado no Netlify como site estático e pode ser instalado no celular (PWA).
 
 ## Fluxo de trabalho
 
@@ -17,15 +17,17 @@ Primefinance é um app web de finanças pessoais (resumo do mês, transações c
 
 ## Comandos
 
-Não há build, dependências, lint nem testes automatizados. Para rodar, basta abrir `index.html` no navegador (é preciso internet para entrar na conta). A publicação consiste em hospedar o `index.html` como arquivo estático (Netlify).
+Não há build, dependências, lint nem testes automatizados. Para rodar, basta abrir `index.html` no navegador (é preciso internet para entrar na conta). A publicação consiste em hospedar a pasta como site estático (Netlify): `index.html` e os arquivos da instalação no celular. O site `sweet-sherbet-0418dd` do Netlify está ligado ao GitHub e publica automaticamente a cada envio para a `main`.
 
 ## Arquitetura
 
 O app inteiro está em `index.html`: CSS em um `<style>`, um pequeno `<script>` no `<head>` e a lógica em um `<script>` no fim do `<body>`. Só usa recursos externos para as fontes Sora e Manrope (Google Fonts) e para o Supabase (via `fetch`, sem biblioteca). O JavaScript é compacto, com nomes curtos, e deve continuar nesse estilo.
 
+Arquivos de apoio para a instalação no celular (PWA): `manifest.webmanifest`, `sw.js`, `icon.svg` (favicon), `icon-192.png`, `icon-512.png` (também usado como ícone "maskable") e `apple-touch-icon.png`. O `sw.js` só guarda arquivos da própria origem, sempre buscando primeiro a versão da rede (usa o cache apenas sem internet), e nunca intercepta as chamadas ao Supabase. Ele só é registrado quando a página é aberta por http(s), não por `file://`. Ao adicionar um arquivo que o app precise para abrir, inclua-o na lista `ARQ` do `sw.js` e troque a versão em `C` (ex.: `primefinance-v2`).
+
 ### Estado e persistência
-- Todo o estado fica no objeto `S = {tx, bills, goals, recur, obj}`, salvo como JSON no `localStorage` na chave `fin1-d-local` (`dk()`). Sempre chame `save()` depois de alterar `S`, e em seguida `render()`.
-- Campos dos modelos: movimentação `{id, d (descrição), v (valor), t ('d' despesa | 'r' receita), c (categoria), dt ('AAAA-MM-DD')}`; conta `{id, d, v, dt, paid, rid?, ym?}`; conta fixa `{id, d, v, day, from ('AAAA-MM'), skip[]}`; `goals` mapeia categoria → limite mensal; objetivo `{id, n (nome), alvo, atual (valor guardado), prazo ('AAAA-MM-DD' ou '')}`. Os valores dos objetivos não geram transações. `fixS()` garante que todos os campos de `S` existam (use-a ao carregar dados).
+- Todo o estado fica no objeto `S = {tx, bills, goals, recur, obj, rin}`, salvo como JSON no `localStorage` na chave `fin1-d-local` (`dk()`). Sempre chame `save()` depois de alterar `S`, e em seguida `render()`.
+- Campos dos modelos: movimentação `{id, d (descrição), v (valor), t ('d' despesa | 'r' receita), c (categoria), dt ('AAAA-MM-DD'), rr?, ym?}`; receita fixa (`S.rin`) `{id, d, v, c, day, from ('AAAA-MM'), skip[]}`; conta `{id, d, v, dt, paid, rid?, ym?}`; conta fixa `{id, d, v, day, from ('AAAA-MM'), skip[]}`; `goals` mapeia categoria → limite mensal; objetivo `{id, n (nome), alvo, atual (valor guardado), prazo ('AAAA-MM-DD' ou '')}`. Os valores dos objetivos não geram transações. `fixS()` garante que todos os campos de `S` existam (use-a ao carregar dados).
 - Tema, cor e nome ficam em chaves separadas: `fin2-tema` (`escuro|claro`), `fin2-cor` (`roxo|verde|azul|cinza`) e `fin2-nome` (nome exibido na saudação "Olá, nome" do painel). O script do `<head>` aplica esses valores antes da renderização para evitar flash. Se mudar a lógica de tema/cor, atualize esse script **e** as funções `setTema`/`setAccent`.
 
 ### Conta e sincronização (Supabase)
@@ -39,11 +41,14 @@ O app inteiro está em `index.html`: CSS em um `<style>`, um pequeno `<script>` 
 ### Fluxo de renderização
 - `render()` redesenha tudo (painel, gráficos, listas) a partir de `S` e do mês selecionado em `#mes`. Não há atualização parcial.
 - `go(view)` alterna entre as seções `v-painel`, `v-mov`, `v-contas`, `v-obj` e `v-cfg` (definidas em `NAV`/`TITLES`).
-- Os cliques são tratados por um único listener em `document`, por atributos: `data-go` (navegação), `data-new` (nova movimentação) e `data-act` + `data-id` (`edit`, `deltx`, `pay`, `editbill`, `delbill`, `delrec`, `editobj`, `delobj`, `dep`, `ret`, `mes`). Botões novos devem seguir esse padrão.
+- Os cliques são tratados por um único listener em `document`, por atributos: `data-go` (navegação), `data-new` (nova movimentação) e `data-act` + `data-id` (`edit`, `deltx`, `pay`, `editbill`, `delbill`, `delrec`, `delrin`, `editobj`, `delobj`, `dep`, `ret`, `mes`). Botões novos devem seguir esse padrão.
 - Todo conteúdo do usuário inserido via `innerHTML` deve passar por `esc()`.
 
 ### Regras de negócio que envolvem várias partes do código
 - **Contas fixas:** `genRecur()` cria uma conta em `S.bills` para cada mês, de `from` até o mês atual, com o `rid` da conta fixa e o `ym`. Ao excluir uma conta gerada, o mês vai para `skip` da conta fixa para não ser recriado.
+- **Receitas fixas:** a opção "Repetir mensalmente (receita fixa)" aparece no formulário de transações quando o tipo é Receita (só em lançamentos novos). `genRecur()` também cria, em `S.tx`, uma receita para cada mês de `from` em diante, com `rr` (id da receita fixa) e `ym`, mas **somente quando a data já chegou** (diferente das contas fixas, que são geradas para o mês inteiro). Ao excluir um lançamento gerado, `delTx()` coloca o mês em `skip`. Editar um lançamento gerado atualiza também a receita fixa (descrição, valor, categoria e dia). "Encerrar" (`delRin()`) remove a repetição e mantém os lançamentos já feitos.
+- **Compras parceladas:** o campo "Número de parcelas" (1 a 48) aparece quando o tipo é Despesa, só em lançamentos novos. Com mais de uma parcela, `parcelas()` divide o valor total em centavos (a sobra vai para a última parcela) e cria uma despesa por mês, a partir da data informada, com a descrição "Nome (i/n)". As parcelas são transações comuns, sem campo extra no modelo. `tipoUI()` controla a exibição desses campos e o aviso `#tparn`.
+- **Comparação com o mês anterior:** em `render()`, `#gasc` (cartão Despesas) compara o total de despesas com o mês anterior ao selecionado, e `cmpP()` coloca uma etiqueta de variação ao lado de cada categoria na legenda da rosca (omitida quando não há despesas na categoria no mês anterior ou quando a variação é 0%). Nomes dos meses: `nm` (abreviados) e `NMF` (completos).
 - **Editar conta:** `editBillFn()` preenche o formulário de contas (só para contas não pagas). Em conta fixa, a alteração de nome, valor e dia vale também para a conta fixa e para as contas ainda não pagas dos meses seguintes.
 - **Alerta de vencimentos:** em `render()`, `#avenc` lista as contas vencidas e as que vencem em até 3 dias (usa `dif()`).
 - **Filtros de transações:** `#fq`, `#ft`, `#fc` e `#fall` filtram apenas a lista `#txs`; os totais do painel continuam sendo do mês selecionado.
@@ -54,7 +59,7 @@ O app inteiro está em `index.html`: CSS em um `<style>`, um pequeno `<script>` 
 - **CSV:** usa `;` como separador, BOM UTF-8 e `csvCel()` para proteger contra injeção de fórmulas.
 
 ### Tema e layout
-- As cores são variáveis CSS em `:root`. A cor de destaque usa `data-accent` e o tema usa `data-theme`. O tema é sempre escuro ou claro (não há modo automático): o script do `<head>` e `setTema` definem `data-theme` como `dark` ou `light`.
+- As cores são variáveis CSS em `:root`. A cor de destaque usa `data-accent` e o tema usa `data-theme`. O tema é sempre escuro ou claro (não há modo automático): o script do `<head>` e `setTema` definem `data-theme` como `dark` ou `light` e ajustam a cor da `meta[name=theme-color]` (`#0a0a10` no escuro, `#f3f2f8` no claro), usada na barra do sistema quando o app está instalado.
 - A barra de abas do celular tem 6 colunas (5 abas e o botão +). Rótulo curto da aba de configurações no celular: `s:'Ajustes'` em `NAV`. A barra some enquanto um campo está focado e volta 350 ms depois do `focusout`, para não cobrir o botão tocado.
 - Breakpoints: abaixo de 960px aparece a barra de abas inferior (`.tabbar`); a partir de 960px aparece a barra lateral (`.side`); a partir de 1100px o painel usa 4 colunas.
 

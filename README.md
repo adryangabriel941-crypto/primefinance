@@ -8,6 +8,9 @@ Funciona direto no navegador, no celular, no tablet e no computador. Não precis
 
 - **Movimentações:** lançar, editar e apagar gastos e receitas, com categoria e data.
 - **Resumo do mês:** receitas, gastos, saldo e quanto ainda falta pagar, com um aviso quando as despesas passam dos ganhos.
+- **Comparação com o mês anterior:** quanto as despesas subiram ou caíram no total e em cada categoria.
+- **Compras parceladas:** informe o valor total e o número de parcelas; cada parcela é lançada no mês correspondente.
+- **Receitas fixas:** salário e outras receitas que se repetem todo mês são lançados automaticamente na data.
 - **Busca e filtros:** procurar transações por descrição, tipo e categoria, no mês ou em todos os meses.
 - **Alerta de vencimentos:** aviso no painel das contas vencidas e das que vencem em até 3 dias.
 - **Objetivos de economia:** metas como "reserva de emergência", com prazo opcional, depósitos, retiradas e sugestão de valor mensal.
@@ -19,6 +22,7 @@ Funciona direto no navegador, no celular, no tablet e no computador. Não precis
 - **Backup e planilha:** baixar e restaurar um backup, e exportar as movimentações em CSV.
 - **Aparência:** tema escuro (padrão) ou claro, com cor de destaque roxa, verde, azul ou cinza.
 - **Layout adaptável:** barra de abas no celular e barra lateral no computador e no tablet.
+- **Instalar no celular:** o app pode ser adicionado à tela inicial, com ícone próprio, e abre mesmo sem internet.
 
 ## Como usar
 
@@ -44,16 +48,18 @@ Mesmo assim, use o botão **Baixar cópia de segurança**, em Configurações, d
 
 ```
 primefinance/
-├── index.html   # o app inteiro: estrutura (HTML), aparência (CSS) e lógica (JavaScript)
-├── README.md    # esta apresentação
+├── index.html            # o app inteiro: estrutura (HTML), aparência (CSS) e lógica (JavaScript)
+├── manifest.webmanifest  # nome, cores e ícones para instalar no celular
+├── sw.js                 # permite abrir o app sem internet (guarda só os arquivos do site)
+├── icon.svg, icon-192.png, icon-512.png, apple-touch-icon.png  # ícones
+├── README.md             # esta apresentação
 └── .gitignore   # arquivos que o Git deve ignorar
 ```
 
-O app é um arquivo único e não usa bibliotecas externas (apenas as fontes Sora e Manrope, do Google Fonts, com fonte de reserva do sistema).
+A lógica do app está toda no `index.html`, que não usa bibliotecas externas (apenas as fontes Sora e Manrope, do Google Fonts, com fonte de reserva do sistema).
 
 ## Próximos passos
 
 - Tela de dicas personalizadas, com base nos próprios números do usuário.
-- Comparação com o mês anterior e resumo do ano.
+- Resumo do ano.
 - Categorias personalizadas.
-- Ícone próprio e instalação na tela inicial do celular.
