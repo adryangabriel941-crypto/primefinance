@@ -60,7 +60,7 @@ Arquivos de apoio para a instalação no celular (PWA): `manifest.webmanifest`, 
 
 ### Tema e layout
 - As cores são variáveis CSS em `:root`. A cor de destaque usa `data-accent` e o tema usa `data-theme`. O tema é sempre escuro ou claro (não há modo automático): o script do `<head>` e `setTema` definem `data-theme` como `dark` ou `light` e ajustam a cor da `meta[name=theme-color]` (`#0a0a10` no escuro, `#f3f2f8` no claro), usada na barra do sistema quando o app está instalado.
-- A barra de abas do celular tem 6 colunas (5 abas e o botão +). Rótulo curto da aba de configurações no celular: `s:'Ajustes'` em `NAV`. A barra some enquanto um campo está focado e volta 350 ms depois do `focusout`, para não cobrir o botão tocado.
+- A navegação do celular é uma **pílula flutuante** (`.tabbar`) com 5 ícones, gerada a partir de `NAV`; só a aba ativa mostra o nome (`n.s` é o rótulo curto, ex.: `s:'Ajustes'`), e os demais têm `aria-label`. O botão "+" é separado (`.fab`, `data-new`). Ambos somem a partir de 960px (aparece a barra lateral), com `body.out` (tela de entrada) e enquanto um campo está focado (`body.typing`, que sai 350 ms depois do `focusout`, para a barra não cobrir o botão tocado). Em telas de até 380px os tamanhos diminuem e, até 340px, o nome da aba ativa é ocultado. Ao mexer nisso, teste em larguras de 320 a 430px.
 - Breakpoints: abaixo de 960px aparece a barra de abas inferior (`.tabbar`); a partir de 960px aparece a barra lateral (`.side`); a partir de 1100px o painel usa 4 colunas.
 
 ## Dados pessoais

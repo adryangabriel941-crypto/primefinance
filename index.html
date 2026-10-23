@@ -48,7 +48,7 @@ h1,h2,p{margin:0}
 :focus-visible{outline:2px solid var(--ac);outline-offset:2px}
 svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
 
-.shell{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;max-width:1360px;margin:0 auto;padding-block:16px 108px}
+.shell{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;max-width:1360px;margin:0 auto;padding-block:16px 124px}
 .main{min-width:0;display:grid;gap:14px;align-content:start}
 .stack{display:grid;gap:12px;align-content:start;min-width:0}
 .split{display:grid;gap:12px;grid-template-columns:minmax(0,1fr);align-items:start}
@@ -65,20 +65,24 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .nav button.on svg{color:var(--ac)}
 .foot{color:var(--mut);font-size:.75rem;margin-top:auto}
 
-.tabbar{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));align-items:end;position:fixed;left:0;right:0;bottom:0;z-index:30;
-  background:var(--surface);border-top:1px solid var(--line);
-  padding:8px max(12px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
-.tabbar button{display:grid;justify-items:center;gap:3px;padding:6px 0;border:0;background:transparent;color:var(--mut);font-size:.64rem;font-weight:600;cursor:pointer;min-width:0;white-space:nowrap}
-.tabbar button span{max-width:100%;overflow:hidden;text-overflow:ellipsis}
-.tabbar button.on{color:var(--ac)}
-.tabbar .add{padding:0}
-.tabbar .add span{width:46px;height:46px;border-radius:50%;background:var(--ac);color:var(--on-ac);display:grid;place-items:center;margin-top:-20px;box-shadow:0 8px 20px color-mix(in srgb,var(--ac) 40%,transparent)}
+.tabbar{display:flex;align-items:center;justify-content:space-between;gap:2px;position:fixed;z-index:30;
+  left:max(14px,env(safe-area-inset-left,0px));right:calc(max(14px,env(safe-area-inset-right,0px)) + 66px);bottom:calc(18px + env(safe-area-inset-bottom,0px));height:62px;padding:0 4px;
+  background:color-mix(in srgb,var(--surface2) 98%,transparent);border:1px solid var(--line);border-radius:31px;
+  box-shadow:0 12px 30px color-mix(in srgb,var(--tx) 18%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.tabbar button{display:flex;align-items:center;justify-content:center;gap:0;height:46px;min-width:40px;padding:0 9px;border:0;border-radius:23px;background:transparent;color:var(--mut);font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;flex:none;transition:background .2s,color .2s}
+.tabbar button span{display:block;max-width:0;opacity:0;overflow:hidden;transition:max-width .25s,opacity .2s,margin .25s}
+.tabbar button.on{background:color-mix(in srgb,var(--ac) 18%,transparent);color:var(--ac)}
+.tabbar button.on span{max-width:96px;opacity:1;margin-left:7px}
+.fab{position:fixed;z-index:30;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));width:58px;height:58px;border-radius:50%;border:0;background:var(--ac);color:var(--on-ac);display:grid;place-items:center;cursor:pointer;box-shadow:0 10px 24px color-mix(in srgb,var(--ac) 45%,transparent)}
+.fab svg.i{width:24px;height:24px}
+@media(max-width:380px){.tabbar{right:calc(max(10px,env(safe-area-inset-right,0px)) + 60px);left:max(10px,env(safe-area-inset-left,0px));padding:0 3px}.tabbar button{padding:0 7px;min-width:36px}.tabbar button.on span{max-width:72px;margin-left:4px}.fab{width:52px;height:52px;right:max(10px,env(safe-area-inset-right,0px))}}
+@media(max-width:340px){.tabbar button.on span{max-width:0;opacity:0;margin:0}}
 
 @media(min-width:960px){
   .shell{grid-template-columns:232px minmax(0,1fr);gap:20px;padding-block:16px}
   .side{display:flex;flex-direction:column;gap:20px;position:sticky;top:16px;height:calc(100vh - 32px);padding:18px 14px;
     background:var(--surface);border:1px solid var(--line);border-radius:20px}
-  .tabbar,.mbrand{display:none}
+  .tabbar,.fab,.mbrand{display:none}
   .split{grid-template-columns:minmax(300px,380px) minmax(0,1fr)}
   .split>.card:first-child{position:sticky;top:16px}
 }
@@ -183,7 +187,7 @@ textarea{min-height:120px;font:16px/1.4 ui-monospace,Menlo,Consolas,monospace;re
 .bar i{display:block;height:100%;border-radius:99px;background:var(--bc)}
 
 /* entrada */
-body.out .shell,body.out .tabbar{display:none}
+body.out .shell,body.out .tabbar,body.out .fab{display:none}
 #auth{display:none;min-height:100vh;padding:24px 0;align-items:center;justify-content:center}
 body.out #auth{display:flex}
 .acard{width:100%;max-width:400px;display:grid;gap:16px;padding:24px}
@@ -227,7 +231,7 @@ body.out #auth{display:flex}
 .msg{font-size:.85rem;color:var(--mut);margin-top:10px;min-height:1.2em}
 .box{margin-top:12px;display:grid;gap:10px}
 
-body.typing .tabbar{display:none}
+body.typing .tabbar,body.typing .fab{display:none}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script>
@@ -368,8 +372,8 @@ catch(e){document.documentElement.setAttribute('data-theme','dark')}
       <div class="card">
         <h2 class="ct" id="ottl">Novo objetivo</h2>
         <form id="fo" class="f">
-          <input class="full" id="on" placeholder="Objetivo (ex.: reserva de emergência)" maxlength="60" required>
-          <input id="ov" type="number" step="0.01" min="0.01" inputmode="decimal" placeholder="Valor desejado" required>
+          <input class="full" id="on" placeholder="Objetivo (ex.: viagem)" maxlength="60" required>
+          <input id="ov" type="number" step="0.01" min="0.01" inputmode="decimal" placeholder="Valor total" aria-label="Valor desejado" required>
           <input id="oi" type="number" step="0.01" min="0" inputmode="decimal" placeholder="Já guardado" aria-label="Valor já guardado (opcional)">
           <label class="fl full">Prazo (opcional)<input id="op" type="date"></label>
           <p class="lbl full">Os valores guardados nos objetivos são controlados separadamente e não alteram o saldo das transações.</p>
@@ -435,6 +439,7 @@ catch(e){document.documentElement.setAttribute('data-theme','dark')}
 </div>
 
 <nav class="tabbar" id="tabs" aria-label="Principal"></nav>
+<button type="button" class="fab" data-new aria-label="Nova transação" data-ic="plus"></button>
 
 <script>
 const $=id=>document.getElementById(id);
@@ -535,8 +540,8 @@ const nomeUser=()=>(lsGet('fin2-nome')||'').trim();
 const saudacao=()=>nomeUser()?'Olá, '+nomeUser():'Olá';
 const TITLES={painel:'Olá',mov:'Transações',contas:'Contas a pagar',obj:'Objetivos',cfg:'Configurações'};
 $('snav').innerHTML=NAV.map(n=>`<button type="button" data-go="${n.v}">${svg(n.i)}${n.t}</button>`).join('');
-const tb=n=>`<button type="button" data-go="${n.v}">${svg(n.i)}<span>${n.s||n.t}</span></button>`;
-$('tabs').innerHTML=tb(NAV[0])+tb(NAV[1])+`<button type="button" class="add" data-new aria-label="Nova movimentação"><span>${svg('plus')}</span></button>`+tb(NAV[2])+tb(NAV[3])+tb(NAV[4]);
+const tb=n=>`<button type="button" data-go="${n.v}" aria-label="${n.t}" title="${n.t}">${svg(n.i)}<span>${n.s||n.t}</span></button>`;
+$('tabs').innerHTML=NAV.map(tb).join('');
 function go(v){
 view=v;
 NAV.forEach(n=>{$('v-'+n.v).hidden=n.v!==v});
