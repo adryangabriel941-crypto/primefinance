@@ -8,6 +8,9 @@ Funciona direto no navegador, no celular, no tablet e no computador. Não precis
 
 - **Movimentações:** lançar, editar e apagar gastos e receitas, com categoria e data.
 - **Resumo do mês:** receitas, gastos, saldo e quanto ainda falta pagar, com um aviso quando as despesas passam dos ganhos.
+- **Busca e filtros:** procurar transações por descrição, tipo e categoria, no mês ou em todos os meses.
+- **Alerta de vencimentos:** aviso no painel das contas vencidas e das que vencem em até 3 dias.
+- **Objetivos de economia:** metas como "reserva de emergência", com prazo opcional, depósitos, retiradas e sugestão de valor mensal.
 - **Contas a pagar:** com vencimento, edição das informações, destaque para contas vencidas e botão para marcar como paga (a conta vira um gasto).
 - **Contas fixas:** contas que se repetem todo mês, no mesmo dia.
 - **Metas por categoria:** limite mensal por categoria, com barra de progresso e aviso ao estourar.
@@ -33,6 +36,8 @@ Isso significa que:
 - é possível entrar em outro aparelho e ver os mesmos dados;
 - sem internet, o app mostra os dados salvos no aparelho e sincroniza quando a conexão voltar.
 
+Se esquecer a senha, use o link **Esqueci minha senha** na tela de entrada.
+
 Mesmo assim, use o botão **Baixar cópia de segurança**, em Configurações, de vez em quando.
 
 ## Estrutura do projeto
@@ -48,7 +53,7 @@ O app é um arquivo único e não usa bibliotecas externas (apenas as fontes Sor
 
 ## Próximos passos
 
+- Tela de dicas personalizadas, com base nos próprios números do usuário.
 - Comparação com o mês anterior e resumo do ano.
-- Busca e filtros nas movimentações.
 - Categorias personalizadas.
-- Alerta de contas a vencer.
+- Ícone próprio e instalação na tela inicial do celular.
