@@ -695,7 +695,8 @@ const NMF=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto
 const dif=dt=>Math.round((new Date(dt+'T00:00:00')-new Date(today+'T00:00:00'))/864e5);
 function render(){
 const m=$('mes').value||today.slice(0,7);
-const tx=S.tx.filter(x=>x.dt.slice(0,7)===m).sort((a,b)=>b.dt.localeCompare(a.dt));
+const pos=new Map(S.tx.map((x,i)=>[x,i])),ord=(a,b)=>b.dt.localeCompare(a.dt)||pos.get(b)-pos.get(a);
+const tx=S.tx.filter(x=>x.dt.slice(0,7)===m).sort(ord);
 const ins=tx.filter(x=>x.t==='r'),outs=tx.filter(x=>x.t==='d');
 const rec=sum(ins),gas=sum(outs),sal=rec-gas;
 const open=S.bills.filter(b=>!b.paid),apg=sum(open);
@@ -760,7 +761,7 @@ const pb=[...open].sort((a,b)=>a.dt.localeCompare(b.dt)).slice(0,4);
 $('pbills').innerHTML=pb.length?pb.map(b=>billRow(b,false)).join(''):'<div class="empty">Não há contas em aberto.</div>';
 $('recent').innerHTML=tx.length?tx.slice(0,6).map(x=>txRow(x,false)).join(''):'<div class="empty">Nenhuma movimentação registrada neste mês.</div>';
 const fq=$('fq').value.trim().toLowerCase(),ft=$('ft').value,fc=$('fc').value,fall=$('fall').checked;
-const lst=(fall?[...S.tx]:tx).filter(x=>(!ft||x.t===ft)&&(!fc||x.c===fc)&&(!fq||x.d.toLowerCase().includes(fq))).sort((a,b)=>b.dt.localeCompare(a.dt));
+const lst=(fall?[...S.tx]:tx).filter(x=>(!ft||x.t===ft)&&(!fc||x.c===fc)&&(!fq||x.d.toLowerCase().includes(fq))).sort(ord);
 const lsd=lst.reduce((s,x)=>s+(x.t==='r'?x.v:-x.v),0);
 $('ttl2').textContent=fall?'Todas as transações':'Transações do mês';
 $('fsum').textContent=lst.length+(lst.length===1?' transação · ':' transações · ')+brl(lsd);
